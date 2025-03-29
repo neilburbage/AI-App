@@ -1,50 +1,22 @@
-# 🚀 AI App
+# AI Assistant 🖥️🤖
 
-A simple Python terminal app powered by OpenAI's GPT-4 Turbo for interactive AI conversations.
+Interact with an AI Assistant powered by Python, Flask, and OpenAI's GPT-4 Turbo.
 
-## 🌟 Features
+## What's New 🚀
 
-- GPT-4 Turbo AI responses
-- Easy terminal interface
-- Secure API integration
+- Flask-based web interface replaces terminal interaction.
+- Responsive and compact UI design.
+- Real-time message handling for smooth interactions.
 
-## 🛠 Installation
+## Quick Start 🛠️
 
-Clone the repo:
+Clone and run the app locally:
 
-```
+```bash
 git clone https://github.com/neilburbage/AI-App.git
 cd AI-App
 ```
 
-### Set API Key
-
-Create `.env` with your OpenAI API key:
-
-```
-OPENAI_API_KEY=your_secret_key_here
-```
-
-### Install Dependencies
-
-```
-pip install -r requirements.txt
-```
-
-Or manually:
-
-```
-pip install openai python-dotenv
-```
-
-### Run
-
-```
-python AI-App.py
-```
-
 ## 💬 Feedback
 
-Submit issues or pull requests to improve the app.
-
-Enjoy! ✨
+Submit issues or pull requests to help improve the app!
