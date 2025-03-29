@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Assistant</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f6;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 90vh;
+        overflow: hidden;
+      }
+
+      h1 {
+        text-align: center;
+        padding: 5px;
+        margin: 0 auto;
+        background-color: #007bff;
+        color: white;
+        font-size: 16px;
+        width: 50%;
+        border-radius: 0 0 10px 10px;
+      }
+
+      .chat-container {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .message {
+        margin-bottom: 8px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        max-width: 75%;
+        word-wrap: break-word;
+        font-size: 12px;
+      }
+
+      .user-message {
+        background-color: #e3efff;
+        align-self: flex-start;
+      }
+
+      .assistant-message {
+        background-color: #f0f2f6;
+        align-self: flex-start;
+      }
+
+      .input-container {
+        display: flex;
+        padding: 5px;
+        gap: 8px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #ddd;
+        width: 50%;
+        margin: 0 auto;
+        border-radius: 10px 10px 0 0;
+      }
+
+      textarea {
+        flex: 1;
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        resize: none;
+        overflow-y: auto;
+        font-family: inherit;
+        font-size: 12px;
+        max-height: 80px;
+      }
+
+      textarea:focus {
+        border-color: #007bff;
+        outline: none;
+      }
+
+      button {
+        padding: 6px 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .clear-button {
+        background-color: #dc3545;
+      }
+
+      .clear-button:hover {
+        background-color: #c82333;
+      }
+
+      #error-message {
+        color: #dc3545;
+        text-align: center;
+        padding: 5px;
+        font-size: 12px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🤖🤗 AI Assistant</h1>
+      <div id="error-message"></div>
+      <div class="chat-container" id="chat-container">
+        {% for message in messages %}
+        <div
+          class="message {% if message.role == 'user' %}user-message{% else %}assistant-message{% endif %}"
+        >
+          {% if message.role == 'user' %}👤 You:{% else %}🤖🤗 Assistant:{%
+          endif %} {{ message.content }}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="input-container">
+        <textarea id="user-input" placeholder="Type your message..."></textarea>
+        <button onclick="sendMessage()">Send</button>
+        <button class="clear-button" onclick="clearChat()">Clear Chat</button>
+      </div>
+    </div>
+
+    <script>
+      const textarea = document.getElementById("user-input");
+
+      textarea.addEventListener("input", () => {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+      });
+
+      textarea.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      async function sendMessage() {
+        const input = textarea.value.trim();
+        if (!input) return;
+        textarea.value = "";
+        textarea.style.height = "auto";
+
+        const chatContainer = document.getElementById("chat-container");
+        chatContainer.innerHTML += `<div class="message user-message">👤 You: ${input}</div>`;
+
+        try {
+          const response = await fetch("/send_message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: input }),
+          });
+          const data = await response.json();
+
+          if (data.status === "success") {
+            chatContainer.innerHTML += `<div class="message assistant-message">🤖🤗 Assistant: ${data.response}</div>`;
+          } else {
+            showError(data.message || "Error in response");
+          }
+        } catch (err) {
+          console.error(err);
+          showError("Failed to send message.");
+        }
+
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+
+      async function clearChat() {
+        document.getElementById("chat-container").innerHTML = "";
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById("error-message");
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+        setTimeout(() => (errorDiv.style.display = "none"), 5000);
+      }
+    </script>
+  </body>
+</html>
